@@ -792,10 +792,15 @@ async function getMergedPosts(collectionApi) {
   const ghostPosts = await getGhostPosts();
   const localListeningPosts = getLocalListeningPosts(collectionApi);
   const localBookPosts = getLocalBookPosts(collectionApi);
-
-  return assignUniqueLocalSlugs(
+  const merged = assignUniqueLocalSlugs(
     dedupePostsByIdentity([...ghostPosts, ...localListeningPosts, ...localBookPosts]).sort(comparePostsDesc)
   );
+
+  console.log(
+    `[afterword] merged posts: ghost=${ghostPosts.length}, local-listening=${localListeningPosts.length}, local-books=${localBookPosts.length}, total=${merged.length}`
+  );
+
+  return merged;
 }
 
 module.exports = function (eleventyConfig) {
