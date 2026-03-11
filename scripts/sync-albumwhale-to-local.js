@@ -328,7 +328,10 @@ async function fetchAlbumWhale() {
   const deduped = [];
   const seen = new Set();
   for (const album of combined) {
-    const key = String(album && (album.id || `${album.link}|${album.date}|${album.title}`)).trim();
+    const key = String(
+      album &&
+        `${String(album.id || "").trim()}|${String(album.link || "").trim()}|${String(album.date || "").trim()}|${String(album.title || "").trim()}`
+    ).trim();
     if (!key || seen.has(key)) {
       continue;
     }
