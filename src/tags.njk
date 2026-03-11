@@ -1,0 +1,64 @@
+---
+pagination:
+  data: collections.tagPages
+  size: 1
+  alias: tagPage
+permalink: "{{ tagPage.url }}"
+layout: base
+---
+
+<section class="section-block tag-archive{% if tagPage.slug == 'status' %} tag-archive-status{% elif tagPage.slug == 'listening' or tagPage.slug == 'now-playing' %} tag-archive-listening{% endif %}">
+  <h1 class="section-title">{% if tagPage.slug == "status" %}Status Archive{% elif tagPage.slug == "listening" or tagPage.slug == "now-playing" %}Listening History{% else %}{{ tagPage.name }}{% endif %}</h1>
+  {% if tagPage.description %}
+    <p class="home-description">{{ tagPage.description }}</p>
+  {% endif %}
+  {% if tagPage.slug == "listening" or tagPage.slug == "now-playing" %}
+  <div class="cover-grid cover-grid-listening h-feed">
+    {% for post in tagPage.posts %}
+      {% set coverImage = post | firstImage %}
+      <article class="cover-card h-entry">
+        <a class="cover-card-link u-url" href="{{ post | localPostUrl }}">
+          {% if coverImage %}
+          <img
+            class="cover-card-image u-photo"
+            src="{{ coverImage.src }}"
+            alt="{{ coverImage.alt }}"
+            loading="lazy"
+          >
+          {% else %}
+          <span class="cover-card-image cover-card-image-fallback" aria-hidden="true"></span>
+          {% endif %}
+          <span class="cover-card-title p-name">{{ post.title }}</span>
+        </a>
+        <time class="site-visually-hidden dt-published" datetime="{{ post.published_at | htmlDateString }}">
+          {{ post.published_at | dateDisplay }}
+        </time>
+        <span class="site-visually-hidden p-author h-card">
+          <a class="p-name u-url" href="{{ site.url }}">{{ site.title }}</a>
+        </span>
+      </article>
+    {% endfor %}
+  </div>
+  {% else %}
+  <ul class="site-list-of-posts h-feed">
+    {% for post in tagPage.posts %}
+      {% set listTitle = post.title | trim %}
+      {% if tagPage.slug == "status" and (not listTitle or (listTitle | isUntitledLikeTitle)) %}
+        {% set listTitle = (post | statusPreview) | firstWords(7) %}
+      {% endif %}
+      <li class="site-list-of-posts-item h-entry">
+        <time class="site-list-date dt-published" datetime="{{ post.published_at | htmlDateString }}">
+          {{ post.published_at | dateDisplay }}
+        </time>
+        <div>
+          <a class="site-list-link p-name u-url" href="{{ post | localPostUrl }}">{{ listTitle or "Untitled" }}</a>
+          <span class="site-visually-hidden p-author h-card">
+            <a class="p-name u-url" href="{{ site.url }}">{{ site.title }}</a>
+          </span>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <p class="tag-feed-note">Follow the <a href="/tags/{{ tagPage.slug }}/rss.xml">RSS feed</a> or <a href="/tags/{{ tagPage.slug }}/feed.json">JSON feed</a> for this tag.</p>
+</section>

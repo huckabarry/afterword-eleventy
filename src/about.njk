@@ -1,0 +1,90 @@
+---
+layout: base
+permalink: /about/index.html
+title: About
+description: "Hello, fellow wanderer. I’m Bryan and this is my blog, a place where I write short status updates about what’s going on in my life, post photos, and occasionally shout into the void."
+---
+
+{% set readingPosts = collections.posts | withAnyTagSlugs("books,now-reading") %}
+{% set readingPost = readingPosts[0] %}
+
+<article class="content content-page h-entry">
+  <header class="post-header">
+    <h1 class="section-title p-name">About</h1>
+    <nav class="about-social" aria-label="Social links">
+      <a class="about-social-link" href="{{ site.relMe[0] }}" aria-label="Mastodon">
+        <i class="fa-brands fa-mastodon" aria-hidden="true"></i>
+      </a>
+      <a class="about-social-link" href="{{ site.relMe[1] }}" aria-label="Bluesky">
+        <i class="fa-brands fa-bluesky" aria-hidden="true"></i>
+      </a>
+      <a class="about-social-link" href="{{ site.microblogUrl }}" aria-label="Micro.blog">
+        <i class="fa-brands fa-microblog" aria-hidden="true"></i>
+      </a>
+      <a class="about-social-link" href="/contact/" aria-label="Contact by email">
+        <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
+      </a>
+    </nav>
+  </header>
+
+<section class="post-full-content">
+  <div class="content-body e-content">
+    <p>Hey, thanks for stopping by.</p>
+
+    <p>I’m Bryan. This site is where I write short posts about whatever has been occupying my brain lately. Sometimes that’s cities and architecture. Sometimes it’s photos from a walk. Sometimes a book, a piece of music, or a stray observation that felt worth writing down before it drifted away.</p>
+
+    <p>By profession I’m an urban planner. I spend a lot of time thinking about how places work and how they could work better. Transit, public space, architecture, and landscape design have a way of sneaking into how I see everything else.</p>
+
+    <p>Outside of work I mostly like making things. Writing, photography, gardening, music, cooking experiments, tinkering with personal websites. The internet used to be full of small strange personal sites and I still believe that’s one of its best forms.</p>
+
+    <p>I grew up in the Great Lakes region and still carry a lot of Midwestern nostalgia around with me. These days I live in the Pacific Northwest with my family, where the forests are mossy and the tomatoes in my yard attempt a coup every August.</p>
+
+    <h2>Why this blog is called <em>Afterword</em></h2>
+
+    <p>Some people publish their thoughts at theirname dot com. That makes sense.</p>
+
+    <p>I like the idea that a website can be something slightly separate from the person behind it. I’m a living thing that changes. This blog is just a small artifact that gets left behind as time moves along.</p>
+
+    <p>The <em>afterword</em> in a book is the reflective part that comes after the story has already happened. A pause to think about what it meant.</p>
+
+    <p>Most of what you’ll find here lives in that space.</p>
+
+    <h2>Interests</h2>
+    <p><em>(in no particular order)</em><br>
+    urban design, landscape architecture, transit maps, subway systems, Detroit, Toronto, New York, Philadelphia, wandering neighborhoods, wandering cities at dusk, mossy Pacific Northwest forests, cedar smell after rain, photography walks, maps of places I haven’t been yet, dark satire, psychological character studies, unconventional love stories, concert ticket stubs, boxes of old letters and photographs, Polaroids, post-it notes, homemade cards, letters, gardening, tomatoes that take over the yard by August, cooking experiments, building and fixing things, small personal websites, RSS feeds, strange corners of the internet, soda water, caramel, potato pancakes, Midwest nostalgia, Italian genealogy rabbit holes, pastoral punk dystopias, the strange landscapes of American suburbia, anti-sprawl, Mies van der Rohe, modernism, desert mid century modernism, Charles and Ray Eames, Frank Gehry, typography, industrial design, Tom Ford, IKEA, Cézanne, post-Impressionism, cubism, watercolors, Murakami, Vonnegut, Dostoevsky, Ray Nayler, Ernest Hemingway, Virginia Woolf, Mitski, Japanese Breakfast, Angel Olsen, Liz Phair, Deep Sea Diver, Cate Le Bon, St. Vincent, Lucy Dacus, Kevin Devine, Pavement, Interpol, David Bowie, New Order, Joy Division, Talking Heads, The Smiths, Gang of Four, Wire, The Modern Lovers, The Beatles, Neil Young, Gord Downie</p>
+  </div>
+</section>
+
+  {% if readingPost %}
+  <section class="section-block">
+    <h2 class="section-title">Reading</h2>
+    <div class="home-stream">
+      {% set post = readingPost %}
+      {% set streamImage = post | firstImage %}
+      <article class="home-stream-item home-stream-item-reading h-entry">
+        <p class="home-stream-meta home-stream-meta-reading">
+          <a class="u-url" href="{{ post | localPostUrl }}">
+            <time class="dt-published" datetime="{{ post.published_at | htmlDateString }}">{{ post.published_at | dateDisplay }}</time>
+          </a>
+        </p>
+        <p class="home-stream-title-reading">
+          <a class="p-name u-url" href="{{ post | localPostUrl }}">{{ post.title }}</a>
+        </p>
+        {% if streamImage %}
+          <a class="home-stream-media home-stream-media-reading u-url" href="{{ post | localPostUrl }}">
+            <img class="home-stream-image home-stream-image-listening u-photo" src="{{ streamImage.src }}" alt="{{ streamImage.alt }}" loading="lazy">
+          </a>
+        {% endif %}
+        <div class="home-stream-body home-stream-body-reading e-content">
+          {% if post.excerpt %}
+            <p>{{ post.excerpt }}</p>
+          {% endif %}
+        </div>
+      </article>
+    </div>
+    <p class="listening-note">
+      See all reading posts <a href="/books/">here</a>.
+    </p>
+  </section>
+  {% endif %}
+</article>

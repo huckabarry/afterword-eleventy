@@ -1,0 +1,27 @@
+{
+  "name": "afterword-eleventy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Eleventy site for Afterword powered by Ghost plus Album Whale data",
+  "main": ".eleventy.js",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "cross-env ELEVENTY_ENV=dev eleventy --serve",
+    "build": "cross-env ELEVENTY_ENV=prod eleventy",
+    "test": "npm run build",
+    "lint": "eslint . --ext .js --cache"
+  },
+  "dependencies": {
+    "@11ty/eleventy": "^0.11.0",
+    "@11ty/eleventy-plugin-rss": "^1.1.1",
+    "@11ty/eleventy-plugin-syntaxhighlight": "^3.0.1",
+    "@tryghost/admin-api": "^1.0.0",
+    "cross-env": "^7.0.0",
+    "dotenv": "^8.0.0",
+    "html-minifier": "^4.0.0",
+    "rss-parser": "^3.13.0"
+  },
+  "devDependencies": {
+    "eslint": "7.32.0"
+  }
+}

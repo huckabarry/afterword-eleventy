@@ -1,0 +1,21 @@
+{% macro card(post) %}
+    <article class="stream-item{% if post.featured %} stream-item-featured{% endif %}">
+        <time class="stream-item-date" datetime="{{ post.published_at | htmlDateString }}">
+            {{ post.published_at | dateReadable }}
+        </time>
+        <div class="stream-item-body">
+            <h2 class="stream-item-title">
+                <a href="{{ post.url }}">{{ post.title }}</a>
+            </h2>
+            {% if post.excerpt %}
+                <p class="stream-item-excerpt">{{ post.excerpt }}</p>
+            {% endif %}
+            <div class="stream-item-meta">
+                {% if post.primary_tag %}
+                    <span>{{ post.primary_tag.name }}</span>
+                {% endif %}
+                <span>{{ post.html | safe | getReadingTime }} min read</span>
+            </div>
+        </div>
+    </article>
+{% endmacro %}

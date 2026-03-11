@@ -1,0 +1,368 @@
+{% extends 'layouts/default.njk' %}
+
+{% set title = post.title %}
+{% set codeinjection_head = post.codeinjection_head %}
+{% set codeinjection_foot = post.codeinjection_foot %}
+
+{% block content %}
+    <article class="content content-post h-entry">
+        <header class="post-header">
+            <a class="site-visually-hidden u-uid" href="{{ site.url }}{{ page.url }}">{{ site.url }}{{ page.url }}</a>
+            <div class="post-meta-row">
+                <time class="post-date dt-published" datetime="{{ post.published_at | htmlDateString }}">{{ post.published_at | dateDisplay }}</time>
+                {% if post.updated_at and post.updated_at != post.published_at %}
+                <time class="site-visually-hidden dt-updated" datetime="{{ post.updated_at | htmlDateString }}">{{ post.updated_at | dateDisplay }}</time>
+                {% endif %}
+                <span class="post-author p-author h-card">
+                    <a class="p-name u-url" href="/">{{ post.primary_author.name | default(site.title) }}</a>
+                </span>
+            </div>
+            {% if post.tags %}
+                <div class="post-tag-list">
+                    {% for tag in post.tags %}
+                        {% if tag.slug != "now" and tag.slug != "afterword" and tag.visibility != "internal" %}
+                        <a class="post-tag tag-pill p-category" href="/tags/{{ tag.slug }}/">{{ tag.name }}</a>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% if not (post | hasTagSlug("status")) %}
+            <h1 class="content-title">
+                <span class="p-name">{{ title }}</span>
+            </h1>
+            {% endif %}
+            {% if post.excerpt %}
+            {% if not (post | hasTagSlug("status")) %}
+                <p class="post-dek p-summary">{{ post.excerpt }}</p>
+            {% endif %}
+            {% endif %}
+        </header>
+        {% if post.feature_image %}
+            <figure class="post-feature-image">
+                <img class="u-photo" src="{{ post.feature_image }}" alt="{{ title }}">
+            </figure>
+        {% endif %}
+        <section class="post-full-content">
+            <section class="content-body load-external-scripts e-content">
+                {{ content | safe }}
+            </section>
+        </section>
+        <div class="photo-lightbox" data-post-lightbox hidden>
+            <button class="photo-lightbox-close" type="button" aria-label="Close image" data-post-lightbox-close>&times;</button>
+            <button class="photo-lightbox-nav photo-lightbox-prev" type="button" aria-label="Previous image" data-post-lightbox-prev>&larr;</button>
+            <div class="photo-lightbox-stage">
+                <img class="photo-lightbox-image" src="" alt="" data-post-lightbox-image>
+            </div>
+            <button class="photo-lightbox-nav photo-lightbox-next" type="button" aria-label="Next image" data-post-lightbox-next>&rarr;</button>
+        </div>
+        <footer class="post-actions" aria-label="Post actions">
+            <a class="post-action-link" href="{{ page.url }}">
+                <span class="post-action-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="14" height="14" rx="2"></rect>
+                        <path d="M7 2v4M13 2v4M3 8h14"></path>
+                        <path d="M14.5 14.5l4-4 1.5 1.5-4 4-2 .5z"></path>
+                    </svg>
+                </span>
+                <span>{{ post.published_at | dateDisplay }}</span>
+            </a>
+            <a class="post-action-link" href="/contact/">
+                <span class="post-action-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="currentColor">
+                        <path d="M64 112c-17.7 0-32 14.3-32 32V368c0 17.7 14.3 32 32 32H448c17.7 0 32-14.3 32-32V144c0-17.7-14.3-32-32-32H64zM112 160H400c6.5 0 12.6 3.1 16.3 8.3L275.7 283.4c-11.1 9.1-27.2 9.1-38.3 0L95.7 168.3c3.7-5.2 9.8-8.3 16.3-8.3z"></path>
+                    </svg>
+                </span>
+                <span>Reply by email</span>
+            </a>
+            <a class="post-action-link" href="/">
+                <span class="post-action-icon" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 448 512" fill="currentColor">
+                        <path d="M257.5 445.1l-22.2 22.2c-9.4 9.4-24.6 9.4-33.9 0L7 273c-9.4-9.4-9.4-24.6 0-33.9L201.4 44.7c9.4-9.4 24.6-9.4 33.9 0l22.2 22.2c9.5 9.5 9.3 25-.4 34.3L150.4 208H424c13.3 0 24 10.7 24 24v32c0 13.3-10.7 24-24 24H150.4l106.7 106.9c9.8 9.3 10 24.8 .4 34.2z"></path>
+                    </svg>
+                </span>
+                <span>Back to all posts</span>
+            </a>
+        </footer>
+        {% set navPosts = collections.posts | withoutTagSlug("status") %}
+        {% set previousPost = navPosts | getPreviousPost(post) %}
+        {% set nextPost = navPosts | getNextPost(post) %}
+        {% if previousPost or nextPost %}
+        <nav class="post-navigation">
+            <ul>
+                <li class="post-navigation-item post-navigation-item-previous">
+                    {% if previousPost %}
+                    <a class="post-navigation-link" href="{{ previousPost | localPostUrl }}">
+                        <span class="post-navigation-label">← Previous</span>
+                        <span class="post-navigation-title">{{ previousPost.title }}</span>
+                    </a>
+                    {% endif %}
+                </li>
+                <li class="post-navigation-item post-navigation-item-next">
+                    {% if nextPost %}
+                    <a class="post-navigation-link" href="{{ nextPost | localPostUrl }}">
+                        <span class="post-navigation-label">Next →</span>
+                        <span class="post-navigation-title">{{ nextPost.title }}</span>
+                    </a>
+                    {% endif %}
+                </li>
+            </ul>
+        </nav>
+        {% endif %}
+        <section
+            class="webmentions"
+            data-webmentions
+            data-target="{{ site.url }}{{ page.url }}"
+            data-api="{{ site.webmentions.api }}"
+        >
+            <h2 class="section-title">Responses</h2>
+            <div class="webmentions-likes" data-likes hidden>
+                <h3 class="webmentions-subtitle">Likes</h3>
+                <div class="webmentions-facepile" data-like-list></div>
+            </div>
+            <div class="webmentions-comments" data-comments hidden>
+                <h3 class="webmentions-subtitle">Comments</h3>
+                <ol class="webmentions-comment-list" data-comment-list></ol>
+            </div>
+        </section>
+        <script>
+            (function () {
+                const lightbox = document.querySelector("[data-post-lightbox]");
+                const lightboxImage = lightbox ? lightbox.querySelector("[data-post-lightbox-image]") : null;
+                const lightboxClose = lightbox ? lightbox.querySelector("[data-post-lightbox-close]") : null;
+                const lightboxPrev = lightbox ? lightbox.querySelector("[data-post-lightbox-prev]") : null;
+                const lightboxNext = lightbox ? lightbox.querySelector("[data-post-lightbox-next]") : null;
+                const images = Array.from(
+                    document.querySelectorAll(".post-feature-image img, .content-body img")
+                ).filter((image) => !image.closest(".kg-bookmark-card"));
+                let currentImageIndex = 0;
+
+                function renderImage(index) {
+                    const image = images[index];
+                    if (!image || !lightboxImage) return;
+
+                    currentImageIndex = index;
+                    lightboxImage.src = image.currentSrc || image.src || "";
+                    lightboxImage.alt = image.alt || "";
+                }
+
+                function openLightbox(index) {
+                    if (!lightbox) return;
+                    renderImage(index);
+                    lightbox.hidden = false;
+                    document.body.classList.add("photo-lightbox-open");
+                }
+
+                function closeLightbox() {
+                    if (!lightbox || !lightboxImage) return;
+                    lightbox.hidden = true;
+                    document.body.classList.remove("photo-lightbox-open");
+                    lightboxImage.src = "";
+                    lightboxImage.alt = "";
+                }
+
+                function stepImage(direction) {
+                    if (!images.length) return;
+                    const nextIndex = (currentImageIndex + direction + images.length) % images.length;
+                    renderImage(nextIndex);
+                }
+
+                images.forEach((image, index) => {
+                    image.classList.add("post-lightbox-trigger");
+                    image.setAttribute("tabindex", "0");
+                    image.setAttribute("role", "button");
+                    image.setAttribute("aria-label", image.alt ? `Expand image: ${image.alt}` : "Expand image");
+
+                    image.addEventListener("click", (event) => {
+                        event.preventDefault();
+                        openLightbox(index);
+                    });
+
+                    image.addEventListener("keydown", (event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            openLightbox(index);
+                        }
+                    });
+                });
+
+                if (lightbox && lightboxClose && lightboxPrev && lightboxNext) {
+                    lightboxClose.addEventListener("click", closeLightbox);
+                    lightboxPrev.addEventListener("click", () => stepImage(-1));
+                    lightboxNext.addEventListener("click", () => stepImage(1));
+
+                    lightbox.addEventListener("click", (event) => {
+                        if (event.target === lightbox) closeLightbox();
+                    });
+                }
+
+                document.addEventListener("keydown", (event) => {
+                    if (!lightbox || lightbox.hidden) return;
+                    if (event.key === "Escape") closeLightbox();
+                    if (event.key === "ArrowLeft") stepImage(-1);
+                    if (event.key === "ArrowRight") stepImage(1);
+                });
+
+                const root = document.querySelector("[data-webmentions]");
+                if (!root) return;
+
+                const target = root.getAttribute("data-target");
+                const api = root.getAttribute("data-api");
+                const likesSection = root.querySelector("[data-likes]");
+                const likeList = root.querySelector("[data-like-list]");
+                const commentsSection = root.querySelector("[data-comments]");
+                const commentList = root.querySelector("[data-comment-list]");
+
+                fetch(`${api}?target=${encodeURIComponent(target)}&per-page=100&sort-by=published&sort-dir=up`)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        const children = Array.isArray(data.children) ? data.children : [];
+                        const likes = children.filter((entry) => entry["wm-property"] === "like-of");
+                        const comments = children.filter((entry) => {
+                            const prop = entry["wm-property"];
+                            return prop === "in-reply-to" || prop === "mention-of";
+                        });
+
+                        likes.forEach((entry) => {
+                            const author = entry.author || {};
+                            const link = document.createElement("a");
+                            link.className = "webmentions-like h-cite u-url";
+                            link.href = entry.url || author.url || "#";
+                            link.target = "_blank";
+                            link.rel = "nofollow noopener noreferrer";
+                            link.title = author.name || "Like";
+
+                            if (author.photo) {
+                                const img = document.createElement("img");
+                                img.className = "u-photo";
+                                img.src = author.photo;
+                                img.alt = author.name || "Like";
+                                img.loading = "lazy";
+                                link.appendChild(img);
+                            }
+
+                            const name = document.createElement("span");
+                            name.className = "site-visually-hidden p-name";
+                            name.textContent = author.name || "Someone";
+                            link.appendChild(name);
+
+                            if (!author.photo) {
+                                const fallback = document.createElement("span");
+                                fallback.setAttribute("aria-hidden", "true");
+                                fallback.textContent = (author.name || "?").slice(0, 1).toUpperCase();
+                                link.appendChild(fallback);
+                            }
+
+                            likeList.appendChild(link);
+                        });
+
+                        comments.forEach((entry) => {
+                            const author = entry.author || {};
+                            const item = document.createElement("li");
+                            item.className = "webmentions-comment h-cite";
+
+                            if (entry.url) {
+                                const citeUrl = document.createElement("a");
+                                citeUrl.className = "site-visually-hidden u-url";
+                                citeUrl.href = entry.url;
+                                citeUrl.textContent = entry.url;
+                                item.appendChild(citeUrl);
+                            }
+
+                            const header = document.createElement("div");
+                            header.className = "webmentions-comment-header";
+
+                            if (author.photo) {
+                                const img = document.createElement("img");
+                                img.className = "webmentions-comment-avatar u-photo";
+                                img.src = author.photo;
+                                img.alt = author.name || "Comment avatar";
+                                img.loading = "lazy";
+                                header.appendChild(img);
+                            }
+
+                            const meta = document.createElement("div");
+                            meta.className = "webmentions-comment-meta";
+
+                            const authorCard = document.createElement("span");
+                            authorCard.className = "webmentions-comment-author p-author h-card";
+                            const name = document.createElement(author.url ? "a" : "span");
+                            name.className = author.url ? "p-name u-url" : "p-name";
+                            name.textContent = author.name || "Someone";
+                            if (author.url) {
+                                name.href = author.url;
+                                name.target = "_blank";
+                                name.rel = "nofollow noopener noreferrer";
+                            }
+                            authorCard.appendChild(name);
+                            meta.appendChild(authorCard);
+
+                            if (entry.published || entry["wm-received"]) {
+                                const time = document.createElement("time");
+                                time.className = "webmentions-comment-date dt-published";
+                                const raw = entry.published || entry["wm-received"];
+                                time.dateTime = raw;
+                                time.textContent = new Date(raw).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric"
+                                });
+                                meta.appendChild(time);
+                            }
+
+                            header.appendChild(meta);
+                            item.appendChild(header);
+
+                            if (entry.content && (entry.content.html || entry.content.text)) {
+                                const body = document.createElement("div");
+                                body.className = "webmentions-comment-body e-content";
+                                body.innerHTML = entry.content.html || entry.content.text;
+                                item.appendChild(body);
+                            } else if (entry.url) {
+                                const link = document.createElement("a");
+                                link.className = "webmentions-comment-link u-url";
+                                link.href = entry.url;
+                                link.target = "_blank";
+                                link.rel = "nofollow noopener noreferrer";
+                                link.textContent = "View mention";
+                                item.appendChild(link);
+                            }
+
+                            commentList.appendChild(item);
+                        });
+
+                        if (likes.length) likesSection.hidden = false;
+                        if (comments.length) commentsSection.hidden = false;
+                    })
+                    .catch(() => {});
+            })();
+        </script>
+    </article>
+{% endblock %}
+
+{%- block seo -%}
+    <!--Twitter Card-->
+    <meta name="twitter:site" content="{{ site.twitter }}">
+    <meta name="twitter:creator" content="{{ post.primary_author.twitter | default(site.twitter) }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ site.url }}{{ page.url }}">
+    <meta name="twitter:title" content="{{ title }} – {{ site.title }}">
+    <meta name="twitter:description" content="{{ post.excerpt }}">
+    <meta name="twitter:image" content="{{ post.feature_image }}">
+
+    <!--Schema-->
+    <link rel="author" href="{{ post.primary_author.website | default(site.url) }}">
+    <link rel="publisher" href="{{ site.url }}">
+    <meta itemprop="name" content="{{ title }} – {{ site.title }}">
+    <meta itemprop="description" content="{{ post.excerpt }}">
+    <meta itemprop="image" content="{{ post.feature_image }}">
+
+    <!-- Facebook OpenGraph -->
+    <meta property="og:url" content="{{ site.url }}{{ page.url }}">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ title }} – {{ site.title }}">
+    <meta property="og:image" content="{{ post.feature_image }}">
+    <meta property="og:description" content="{{ post.excerpt }}">
+    <meta property="og:site_name" content="{{ site.title }}">
+    <meta property="og:locale" content="{{ site.lang | default('en_US') }}">
+    <meta property="article:author" content="{{ site.url }}">
+{%- endblock -%}
