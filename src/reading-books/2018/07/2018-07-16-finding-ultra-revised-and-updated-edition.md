@@ -20,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2018-07-16 reviewed (3 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457547))
+- 2018-07-16 reviewed - (3 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457547))

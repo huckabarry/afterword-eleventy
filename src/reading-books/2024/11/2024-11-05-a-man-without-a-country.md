@@ -20,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2024-11-05 reviewed (4 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457536))
+- 2024-11-05 reviewed - (4 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457536))

@@ -20,5 +20,5 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/generatednote/
 
 ## Reading Log
 
-- 2024-11-26 reviewed (3 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457535))
+- 2024-11-26 reviewed - (3 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457535))
 - 2025-10-28 finished ([source](https://bookwyrm.social/user/bryan/generatednote/8825626))

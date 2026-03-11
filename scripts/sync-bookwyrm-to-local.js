@@ -9,6 +9,7 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const POSTS_ROOT = path.join(ROOT_DIR, "src", "reading-books");
 const IMAGES_ROOT = path.join(ROOT_DIR, "src", "assets", "reading-images");
 const DEFAULT_AUTHOR = "Bryan Robb";
+const FEED_URL = "https://bookwyrm.social/user/bryan/rss";
 const OUTBOX_URL = "https://bookwyrm.social/user/bryan/outbox";
 const BOOK_HOST = "https://bookwyrm.social";
 const MAX_ITEMS = 120;
@@ -874,15 +875,22 @@ async function main() {
   await fsp.mkdir(IMAGES_ROOT, { recursive: true });
 
   const records = await loadExistingRecords();
-  const outboxItems = await fetchBookWyrmOutboxItems();
+  const feedXml = await fetchText(FEED_URL);
+  const feedItems = parseRssItems(feedXml);
 
-  for (const outboxItem of outboxItems) {
-    const activity = parseBookWyrmOutboxActivity(outboxItem);
-    if (!activity) {
+  for (const feedItem of feedItems) {
+    const eventType = classifyItem(feedItem);
+    if (!eventType) {
       continue;
     }
 
-    const key = buildBookKey(activity.bookUrl, activity.bookTitle);
+    const resolvedBookUrl = feedItem.bookUrl || (await resolveBookUrlFromEntryUrl(feedItem.link));
+    const bookTitle = deriveBookTitle(feedItem);
+    if (!bookTitle && !resolvedBookUrl) {
+      continue;
+    }
+
+    const key = buildBookKey(resolvedBookUrl, bookTitle);
 
     if (!records.has(key)) {
       records.set(key, createBookRecord());
@@ -890,17 +898,16 @@ async function main() {
 
     const record = records.get(key);
     record.key = key;
-    record.bookTitle = record.bookTitle || activity.bookTitle;
-    record.bookAuthor = record.bookAuthor || activity.bookAuthor;
-    record.bookUrl = record.bookUrl || activity.bookUrl;
-    record.coverRemoteUrl = record.coverRemoteUrl || activity.coverUrl;
+    record.bookTitle = record.bookTitle || bookTitle;
+    record.bookAuthor = record.bookAuthor || deriveBookAuthorFromRawTitle(feedItem.title);
+    record.bookUrl = record.bookUrl || resolvedBookUrl;
 
     upsertEvent(record, {
-      type: activity.eventType,
-      date: activity.date,
-      rating: activity.rating,
-      sourceUrl: activity.sourceUrl,
-      note: activity.note
+      type: eventType,
+      date: normalizeDate(feedItem.date),
+      rating: eventType === "review" ? parseReviewRating(feedItem.title) : null,
+      sourceUrl: feedItem.link,
+      note: cleanBookEventNote(feedItem.description || deriveReviewHeadline(feedItem.title), eventType)
     });
   }
 
