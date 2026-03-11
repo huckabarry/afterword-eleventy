@@ -908,10 +908,12 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addCollection("bookPosts", async (collectionApi) => {
     const posts = assignUniqueLocalSlugs(getLocalBookPosts(collectionApi)).sort(comparePostsDesc);
 
-    return posts.map((post) => ({
-      ...post,
-      firstImage: extractFirstImage(post)
-    }));
+    return posts
+      .map((post) => ({
+        ...post,
+        firstImage: extractFirstImage(post)
+      }))
+      .filter((post) => post.firstImage);
   });
 
   eleventyConfig.addCollection("tagPages", async (collectionApi) => {

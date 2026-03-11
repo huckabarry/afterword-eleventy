@@ -13,7 +13,9 @@
     "prebuild": "npm run sync:content",
     "build": "cross-env ELEVENTY_ENV=prod eleventy",
     "test": "npm run build",
-    "lint": "eslint . --ext .js --cache"
+    "lint": "eslint . --ext .js --cache",
+    "deploy": "npm run build && wrangler deploy",
+    "preview": "npm run build && wrangler dev"
   },
   "dependencies": {
     "@11ty/eleventy": "^3.1.2",
@@ -26,6 +28,7 @@
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
-    "eslint": "7.32.0"
+    "eslint": "7.32.0",
+    "wrangler": "^4.72.0"
   }
 }

@@ -47,16 +47,14 @@ layout: base
   <div class="photo-grid books-grid h-feed">
     {% for post in tagPage.posts %}
       {% set coverImage = post | firstImage %}
+      {% if coverImage %}
       <article class="photo-card h-entry">
         <a class="photo-card-link u-url" href="{{ post | localPostUrl }}">
-          {% if coverImage %}
           <img class="photo-card-image books-card-image u-photo" src="{{ coverImage.src }}" alt="{{ coverImage.alt }}" loading="lazy">
-          {% else %}
-          <span class="photo-card-image books-card-image books-card-image-fallback" aria-hidden="true"></span>
-          {% endif %}
         </a>
         <span class="site-visually-hidden p-name">{{ post.title }}</span>
       </article>
+      {% endif %}
     {% endfor %}
   </div>
   {% else %}
