@@ -58,7 +58,8 @@ description: "Hello, fellow wanderer. I’m Bryan and this is my blog, a place w
       {% for interest in interests %}
         {% set pill = interest | trim %}
         {% if pill %}
-          <li class="interest-pill">{{ pill }}</li>
+          {% set hue = ((loop.index0 / (interestCount - 1)) * 300) | round(0, 'floor') %}
+          <li class="interest-pill" style="--pill-hue: {{ hue }};">{{ pill }}</li>
         {% endif %}
       {% endfor %}
     </ul>
@@ -71,7 +72,7 @@ description: "Hello, fellow wanderer. I’m Bryan and this is my blog, a place w
     <div class="home-stream">
       {% set post = readingPost %}
       {% set streamImage = post | firstImage %}
-      {% set readingExcerpt = post.excerpt or (post | rssDescription) or ('From my recent reading notes on ' + post.title + '.') %}
+      {% set readingExcerpt = post.excerpt or (post | rssDescription) %}
       <article class="home-stream-item home-stream-item-reading h-entry">
         <p class="home-stream-meta home-stream-meta-reading">
           <a class="u-url" href="{{ post | localPostUrl }}">
