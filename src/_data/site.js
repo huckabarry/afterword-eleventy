@@ -66,7 +66,7 @@ module.exports = async function () {
     },
     {
       label: "Books",
-      url: "/books/"
+      url: "/tags/books/"
     },
     {
       label: "About",

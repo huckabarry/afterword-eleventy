@@ -2,11 +2,13 @@
   "name": "afterword-eleventy",
   "version": "1.0.0",
   "private": true,
-  "description": "Eleventy site for Afterword powered by Ghost plus Album Whale data",
+  "description": "Eleventy site for Afterword powered by Ghost plus local BookWyrm and Album Whale syncs",
   "main": ".eleventy.js",
   "scripts": {
     "start": "npm run dev",
     "dev": "cross-env ELEVENTY_ENV=dev eleventy --serve",
+    "sync:albumwhale": "node scripts/sync-albumwhale-to-local.js",
+    "sync:bookwyrm": "node scripts/sync-bookwyrm-to-local.js",
     "build": "cross-env ELEVENTY_ENV=prod eleventy",
     "test": "npm run build",
     "lint": "eslint . --ext .js --cache"
