@@ -823,9 +823,7 @@ module.exports = function (eleventyConfig) {
   eleventyConfig.addFilter("xmlEscape", (value) => xmlEscape(value));
   eleventyConfig.addFilter("cdataSafe", (value) => cdataSafe(value));
   eleventyConfig.addFilter("absoluteUrl", (value, base) => toAbsoluteUrl(value, base));
-  eleventyConfig.addNunjucksAsyncFilter("htmlToAbsoluteUrls", (html, base, callback) => {
-    callback(null, convertHtmlToAbsoluteUrls(html, base));
-  });
+  eleventyConfig.addFilter("htmlToAbsoluteUrls", (html, base) => convertHtmlToAbsoluteUrls(html, base));
   eleventyConfig.addFilter("getReadingTime", (html) => {
     const text = String(html || "").replace(/<[^>]*>/g, " ");
     const words = text.trim().split(/\s+/).filter(Boolean).length;
