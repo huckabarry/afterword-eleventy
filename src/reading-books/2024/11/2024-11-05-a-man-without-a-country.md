@@ -1,12 +1,13 @@
 ---
 title: "A man without a country"
 date: 2024-11-05T00:00:00.000Z
+updated_at: 2024-11-05T00:00:00.000Z
 tags:
   - books
 slug: "a-man-without-a-country"
 author: "Bryan Robb"
 book_author: "Kurt Vonnegut"
-excerpt: "Finished on 2024-11-05"
+excerpt: "Reading log"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457536"
 book_url: "https://bookwyrm.social/book/92349"
 ---
@@ -19,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2024-11-05 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457536))
+- 2024-11-05 reviewed (4 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457536))

@@ -1,12 +1,13 @@
 ---
 title: "The Omnivore's Dilemma"
 date: 2024-10-28T00:00:00.000Z
+updated_at: 2024-10-28T00:00:00.000Z
 tags:
   - books
 slug: "the-omnivore-s-dilemma"
 author: "Bryan Robb"
 book_author: "Michael Pollan"
-excerpt: "Finished on 2024-10-28"
+excerpt: "Reading log"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457537"
 book_url: "https://bookwyrm.social/book/20791"
 ---
@@ -19,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2024-10-28 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457537))
+- 2024-10-28 reviewed (5 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457537))

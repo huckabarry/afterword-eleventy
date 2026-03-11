@@ -1,6 +1,7 @@
 ---
 title: "Disorganized Attachment"
-date: 2025-12-12T03:18:55.000Z
+date: 2025-12-12T00:00:00.000Z
+updated_at: 2025-12-12T00:00:00.000Z
 tags:
   - books
 slug: "disorganized-attachment"
@@ -19,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/generatednote/
 
 ## Reading Log
 
-- 2025-12-12 finished - bryan finished reading Disorganized Attachment ([source](https://bookwyrm.social/user/bryan/generatednote/9182835))
+- 2025-12-12 finished ([source](https://bookwyrm.social/user/bryan/generatednote/9182835))

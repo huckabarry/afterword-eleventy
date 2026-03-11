@@ -1,12 +1,13 @@
 ---
 title: "Win Every Argument"
 date: 2025-02-12T00:00:00.000Z
+updated_at: 2025-02-12T00:00:00.000Z
 tags:
   - books
 slug: "win-every-argument"
 author: "Bryan Robb"
 book_author: "Mehdi Hasan"
-excerpt: "Finished on 2025-02-12"
+excerpt: "Reading log"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457522"
 book_url: "https://bookwyrm.social/book/827872"
 ---
@@ -19,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2025-02-12 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457522))
+- 2025-02-12 reviewed (4 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457522))

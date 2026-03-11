@@ -1,12 +1,13 @@
 ---
 title: "Highly Sensitive Person in Love"
 date: 2020-02-11T00:00:00.000Z
+updated_at: 2020-02-11T00:00:00.000Z
 tags:
   - books
 slug: "highly-sensitive-person-in-love"
 author: "Bryan Robb"
 book_author: "Elaine Aron"
-excerpt: "Finished on 2020-02-11"
+excerpt: "Reading log"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457538"
 book_url: "https://bookwyrm.social/book/674354"
 ---
@@ -19,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2020-02-11 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457538))
+- 2020-02-11 reviewed (4 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457538))

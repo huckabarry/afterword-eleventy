@@ -1,6 +1,7 @@
 ---
 title: "Running on empty"
-date: 2025-10-26T00:51:05.000Z
+date: 2025-10-26T00:00:00.000Z
+updated_at: 2025-10-26T00:00:00.000Z
 tags:
   - books
   - now-reading
@@ -20,4 +21,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/generatednote/
 
 ## Reading Log
 
-- 2025-10-26 started - bryan started reading Running on empty ([source](https://bookwyrm.social/user/bryan/generatednote/8811061))
+- 2025-10-26 started ([source](https://bookwyrm.social/user/bryan/generatednote/8811061))

@@ -1,12 +1,13 @@
 ---
 title: "Happy City"
 date: 2025-04-10T00:00:00.000Z
+updated_at: 2025-04-10T00:00:00.000Z
 tags:
   - books
 slug: "happy-city"
 author: "Bryan Robb"
 book_author: "Charles Montgomery"
-excerpt: "Finished on 2025-04-10"
+excerpt: "Reading log"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457519"
 book_url: "https://bookwyrm.social/book/36844"
 ---
@@ -19,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2025-04-10 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457519))
+- 2025-04-10 reviewed (3 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457519))

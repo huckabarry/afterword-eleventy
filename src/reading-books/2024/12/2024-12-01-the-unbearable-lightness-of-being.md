@@ -1,12 +1,13 @@
 ---
 title: "The Unbearable Lightness of Being"
 date: 2024-12-01T00:00:00.000Z
+updated_at: 2024-12-01T00:00:00.000Z
 tags:
   - books
 slug: "the-unbearable-lightness-of-being"
 author: "Bryan Robb"
 book_author: "Milan Kundera"
-excerpt: "Finished on 2024-12-01"
+excerpt: "Reading log"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457529"
 book_url: "https://bookwyrm.social/book/46558"
 ---
@@ -19,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2024-12-01 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457529))
+- 2024-12-01 reviewed (4 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457529))

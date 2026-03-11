@@ -1,12 +1,13 @@
 ---
 title: "Radical Acceptance"
 date: 2020-02-29T00:00:00.000Z
+updated_at: 2020-02-29T00:00:00.000Z
 tags:
   - books
 slug: "radical-acceptance"
 author: "Bryan Robb"
 book_author: "Tara Brach"
-excerpt: "Finished on 2020-02-29"
+excerpt: "Reading log"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457540"
 book_url: "https://bookwyrm.social/book/85565"
 ---
@@ -19,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2020-02-29 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457540))
+- 2020-02-29 reviewed (4 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457540))

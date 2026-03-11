@@ -1,12 +1,13 @@
 ---
 title: "Meat Is for Pussies"
 date: 2018-07-26T00:00:00.000Z
+updated_at: 2018-07-26T00:00:00.000Z
 tags:
   - books
 slug: "meat-is-for-pussies"
 author: "Bryan Robb"
 book_author: "John Joseph"
-excerpt: "Finished on 2018-07-26"
+excerpt: "Reading log"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457546"
 book_url: "https://bookwyrm.social/book/501949"
 ---
@@ -19,4 +20,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2018-07-26 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457546))
+- 2018-07-26 reviewed (4 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457546))

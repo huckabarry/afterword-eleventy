@@ -1,14 +1,14 @@
 ---
 layout: base
-title: Listening Now
+title: Listening
 permalink: /listening-now/
 eleventyExcludeFromCollections: true
 ---
 
-{% set listeningPosts = collections.posts | withAnyTagSlugs("listening,now-playing") | byPublishedDateDesc %}
+{% set listeningPosts = collections.listeningPosts | byPublishedDateDesc %}
 
 <section class="section-block tag-archive tag-archive-listening">
-  <h1 class="section-title">Listening Now</h1>
+  <h1 class="section-title">Listening</h1>
 
   {% if listeningPosts and listeningPosts.length %}
     <div class="cover-grid cover-grid-listening h-feed">
@@ -41,6 +41,6 @@ eleventyExcludeFromCollections: true
       {% endfor %}
     </div>
   {% else %}
-    <p>No Album Whale entries yet.</p>
+    <p>No listening posts are available yet.</p>
   {% endif %}
 </section>

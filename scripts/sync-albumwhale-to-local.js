@@ -9,10 +9,10 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const POSTS_ROOT = path.join(ROOT_DIR, "src", "listening-albums");
 const IMAGES_ROOT = path.join(ROOT_DIR, "src", "assets", "listening-images");
 const DEFAULT_AUTHOR = "Bryan Robb";
-const FEED_URL = "https://albumwhale.com/bryan/listening-now.atom";
-const LIST_PAGE_URL = "https://albumwhale.com/bryan/listening-now";
+const PROFILE_URL = "https://albumwhale.com/bryan";
+const DEFAULT_LIST_PATH = "/bryan/listening-now";
 
-let listPageHtmlCache = null;
+const listPageHtmlCache = new Map();
 
 function slugify(value) {
   return String(value || "")
@@ -32,11 +32,49 @@ function escapeYaml(value) {
     .replace(/"/g, "\\\"");
 }
 
+function decodeHtmlEntities(value) {
+  const text = String(value == null ? "" : value);
+  const named = {
+    amp: "&",
+    apos: "'",
+    quot: "\"",
+    lt: "<",
+    gt: ">",
+    nbsp: " "
+  };
+  const toCodePoint = (num) => {
+    if (!Number.isInteger(num) || num < 0 || num > 0x10ffff) {
+      return "";
+    }
+
+    try {
+      return String.fromCodePoint(num);
+    } catch (error) {
+      return "";
+    }
+  };
+
+  return text
+    .replace(/&#(\d+);/g, (_, dec) => toCodePoint(Number.parseInt(dec, 10)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => toCodePoint(Number.parseInt(hex, 16)))
+    .replace(/&([a-zA-Z][a-zA-Z0-9]+);/g, (match, name) => {
+      const key = String(name).toLowerCase();
+      return Object.prototype.hasOwnProperty.call(named, key) ? named[key] : match;
+    });
+}
+
+function stripHtml(value) {
+  return decodeHtmlEntities(String(value || "").replace(/<[^>]+>/g, " "))
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function toIsoDate(value) {
   const parsed = new Date(value || Date.now());
   if (Number.isNaN(parsed.getTime())) {
     return new Date().toISOString();
   }
+
   return parsed.toISOString();
 }
 
@@ -58,37 +96,8 @@ function getUrlExtension(url) {
   } catch (error) {
     return ".jpg";
   }
+
   return ".jpg";
-}
-
-function decodeHtmlEntities(value) {
-  const text = String(value == null ? "" : value);
-  const named = {
-    amp: "&",
-    apos: "'",
-    quot: "\"",
-    lt: "<",
-    gt: ">",
-    nbsp: " "
-  };
-  const toCodePoint = (num) => {
-    if (!Number.isInteger(num) || num < 0 || num > 0x10ffff) {
-      return "";
-    }
-    try {
-      return String.fromCodePoint(num);
-    } catch (error) {
-      return "";
-    }
-  };
-
-  return text
-    .replace(/&#(\d+);/g, (_, dec) => toCodePoint(Number.parseInt(dec, 10)))
-    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => toCodePoint(Number.parseInt(hex, 16)))
-    .replace(/&([a-zA-Z][a-zA-Z0-9]+);/g, (match, name) => {
-      const key = String(name).toLowerCase();
-      return Object.prototype.hasOwnProperty.call(named, key) ? named[key] : match;
-    });
 }
 
 function extractTag(xml, tagName) {
@@ -102,24 +111,6 @@ function extractLinkHref(entry) {
   return match ? match[1].trim() : "";
 }
 
-function parseAtomItems(xml) {
-  const entries = String(xml || "").match(/<entry\b[\s\S]*?<\/entry>/gi) || [];
-
-  return entries.map((entry) => {
-    const title = extractTag(entry, "title");
-    const updated = extractTag(entry, "updated");
-    const published = extractTag(entry, "published");
-    const link = extractLinkHref(entry);
-
-    return {
-      title,
-      link,
-      date: updated || published || null,
-      cover: null
-    };
-  });
-}
-
 function toAbsoluteUrl(url, base) {
   try {
     return new URL(url, base).toString();
@@ -128,14 +119,70 @@ function toAbsoluteUrl(url, base) {
   }
 }
 
+function extractCoverFromContent(contentHtml, baseUrl) {
+  const match = String(contentHtml || "").match(/<img[^>]+src=["']([^"']+)["'][^>]*>/i);
+  return match && match[1] ? toAbsoluteUrl(match[1], baseUrl) : "";
+}
+
+function extractNoteFromContent(contentHtml, isoDate) {
+  const withoutImages = String(contentHtml || "")
+    .replace(/<a[^>]*>\s*<img[\s\S]*?\/?>\s*<\/a>/gi, " ")
+    .replace(/<img[^>]*>/gi, " ");
+  const text = stripHtml(withoutImages);
+
+  if (!text) {
+    return "";
+  }
+
+  const formattedDate = new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(new Date(isoDate));
+
+  return text === formattedDate ? "" : text;
+}
+
+function parseAtomItems(xml, context = {}) {
+  const entries = String(xml || "").match(/<entry\b[\s\S]*?<\/entry>/gi) || [];
+  const listUrl = String(context.listUrl || "").trim();
+  const listSlug = String(context.listSlug || "").trim();
+  const listName = String(context.listName || "").trim();
+
+  return entries.map((entry) => {
+    const id = extractTag(entry, "id");
+    const title = extractTag(entry, "title");
+    const updated = extractTag(entry, "updated");
+    const published = extractTag(entry, "published");
+    const link = extractLinkHref(entry);
+    const contentHtml = extractTag(entry, "content");
+    const isoDate = toIsoDate(published || updated || null);
+
+    return {
+      id,
+      title,
+      link,
+      date: isoDate,
+      cover: extractCoverFromContent(contentHtml, link || listUrl || PROFILE_URL) || null,
+      note: extractNoteFromContent(contentHtml, isoDate),
+      listUrl,
+      listSlug,
+      listName
+    };
+  });
+}
+
 function getAlbumAnchorId(link) {
   if (!link) {
     return "";
   }
+
   const hashIndex = link.indexOf("#");
   if (hashIndex === -1) {
     return "";
   }
+
   const fragment = link.slice(hashIndex + 1).trim();
   return fragment.startsWith("album_") ? fragment : "";
 }
@@ -174,7 +221,7 @@ async function fetchText(url) {
     redirect: "follow",
     headers: {
       "User-Agent": "afterword.blog albumwhale sync script",
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
     }
   });
 
@@ -185,35 +232,112 @@ async function fetchText(url) {
   return response.text();
 }
 
-async function getListPageHtml() {
-  if (listPageHtmlCache) {
-    return listPageHtmlCache;
+function parseProfileListPaths(profileHtml) {
+  const matches = Array.from(String(profileHtml || "").matchAll(/href=["'](\/bryan\/[^"'?#]+)["']/g));
+  const paths = matches
+    .map((match) => match[1])
+    .filter((value) => {
+      const parts = String(value || "")
+        .split("/")
+        .filter(Boolean);
+      return parts.length === 2 && parts[0] === "bryan";
+    });
+
+  const unique = Array.from(new Set(paths));
+  if (!unique.includes(DEFAULT_LIST_PATH)) {
+    unique.push(DEFAULT_LIST_PATH);
   }
-  listPageHtmlCache = await fetchText(LIST_PAGE_URL);
-  return listPageHtmlCache;
+
+  return unique;
 }
 
-async function fetchAlbumWhale() {
-  const feedXml = await fetchText(FEED_URL);
-  const albums = parseAtomItems(feedXml);
+function getListSlug(listPath) {
+  const parts = String(listPath || "")
+    .split("/")
+    .filter(Boolean);
+  return parts.length >= 2 ? parts[1] : "";
+}
+
+function getListName(listSlug) {
+  return String(listSlug || "")
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+async function getListPageHtml(listUrl) {
+  const target = String(listUrl || "").trim();
+  if (!target) {
+    return "";
+  }
+
+  if (listPageHtmlCache.has(target)) {
+    return listPageHtmlCache.get(target);
+  }
+
+  const html = await fetchText(target);
+  listPageHtmlCache.set(target, html);
+  return html;
+}
+
+async function fetchAlbumWhaleList(listPath) {
+  const listUrl = toAbsoluteUrl(listPath, PROFILE_URL);
+  const listSlug = getListSlug(listPath);
+  const listName = getListName(listSlug);
+  const feedUrl = `${listUrl}.atom`;
+  const feedXml = await fetchText(feedUrl);
+  const albums = parseAtomItems(feedXml, { listUrl, listSlug, listName });
   const needsScrape = albums.some((item) => !item.cover && getAlbumAnchorId(item.link));
-  const listHtml = needsScrape ? await getListPageHtml() : "";
+  const listHtml = needsScrape ? await getListPageHtml(listUrl) : "";
 
   return albums.map((album) => {
     if (album.cover) {
       return album;
     }
+
     const albumId = getAlbumAnchorId(album.link);
     if (!albumId || !listHtml) {
       return album;
     }
+
     const block = extractAlbumBlockHtml(listHtml, albumId);
-    const cover = extractCoverFromAlbumBlock(block, LIST_PAGE_URL);
+    const cover = extractCoverFromAlbumBlock(block, listUrl);
+
     return {
       ...album,
       cover: cover || null
     };
   });
+}
+
+async function fetchAlbumWhale() {
+  const profileHtml = await fetchText(PROFILE_URL);
+  const listPaths = parseProfileListPaths(profileHtml);
+  const combined = [];
+
+  for (const listPath of listPaths) {
+    try {
+      const listAlbums = await fetchAlbumWhaleList(listPath);
+      combined.push(...listAlbums);
+    } catch (error) {
+      console.warn(`[albumwhale-sync] unable to fetch ${listPath}: ${error.message}`);
+    }
+  }
+
+  const deduped = [];
+  const seen = new Set();
+  for (const album of combined) {
+    const key = String(album && (album.id || `${album.link}|${album.date}|${album.title}`)).trim();
+    if (!key || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    deduped.push(album);
+  }
+
+  return deduped.sort((a, b) => new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime());
 }
 
 async function downloadFile(url, destination) {
@@ -246,8 +370,11 @@ function createMarkdown({
   isoDate,
   slug,
   albumWhaleUrl,
+  albumWhaleList,
+  albumWhaleListName,
   coverPublicPath,
-  albumWhaleOrder
+  albumWhaleOrder,
+  note
 }) {
   const frontMatter = [
     "---",
@@ -258,7 +385,9 @@ function createMarkdown({
     `slug: "${escapeYaml(slug)}"`,
     `author: "${escapeYaml(DEFAULT_AUTHOR)}"`,
     `albumwhale_url: "${escapeYaml(albumWhaleUrl || "")}"`,
+    ...(albumWhaleList ? [`albumwhale_list: "${escapeYaml(albumWhaleList)}"`] : []),
     `albumwhale_order: ${Number.isInteger(albumWhaleOrder) ? albumWhaleOrder : 9999}`,
+    ...(note ? [`excerpt: "${escapeYaml(note)}"`] : []),
     "---",
     ""
   ];
@@ -269,16 +398,45 @@ function createMarkdown({
     body.push(`![](${coverPublicPath})`, "");
   }
 
+  if (note) {
+    body.push(note, "");
+  }
+
+  if (albumWhaleListName) {
+    body.push(`Source list: ${albumWhaleListName}.`, "");
+  }
+
   if (albumWhaleUrl) {
-    body.push(`Listened on [Album Whale](${albumWhaleUrl}).`);
+    body.push(`Listened on [Album Whale](${albumWhaleUrl}).`, "");
   }
 
   if (!body.length) {
-    body.push("Listening entry.");
+    body.push("Listening entry.", "");
   }
 
-  body.push("");
   return frontMatter.concat(body).join("\n");
+}
+
+async function listListeningMarkdownFiles() {
+  const files = [];
+
+  const walk = async (dir) => {
+    const entries = await fsp.readdir(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory()) {
+        await walk(fullPath);
+      } else if (entry.isFile() && entry.name.endsWith(".md") && !entry.name.startsWith("_")) {
+        files.push(fullPath);
+      }
+    }
+  };
+
+  if (fs.existsSync(POSTS_ROOT)) {
+    await walk(POSTS_ROOT);
+  }
+
+  return files;
 }
 
 async function main() {
@@ -291,13 +449,17 @@ async function main() {
 
   let createdPosts = 0;
   let updatedPosts = 0;
+  let removedPosts = 0;
   let downloadedImages = 0;
   let existingImages = 0;
   let failedImages = 0;
+  const keepPaths = new Set();
 
   for (const [albumIndex, album] of albums.entries()) {
     const title = String(album && album.title ? album.title : "").trim() || "Untitled album";
     const albumWhaleUrl = String(album && album.link ? album.link : "").trim();
+    const albumWhaleList = String(album && album.listSlug ? album.listSlug : "").trim();
+    const albumWhaleListName = String(album && album.listName ? album.listName : "").trim();
     const isoDate = toIsoDate(album && album.date ? album.date : undefined);
     const { year, month, day } = dateParts(isoDate);
     const slugBase = slugify(title).slice(0, 90) || "album";
@@ -326,6 +488,7 @@ async function main() {
         } else {
           existingImages += 1;
         }
+
         coverPublicPath = `/assets/listening-images/${year}/${imageName}`;
       } catch (error) {
         failedImages += 1;
@@ -338,8 +501,11 @@ async function main() {
       isoDate,
       slug: baseName,
       albumWhaleUrl,
+      albumWhaleList,
+      albumWhaleListName,
       coverPublicPath,
-      albumWhaleOrder: albumIndex
+      albumWhaleOrder: albumIndex,
+      note: String(album && album.note ? album.note : "").trim()
     });
 
     const alreadyExists = fs.existsSync(postPath);
@@ -353,10 +519,20 @@ async function main() {
         createdPosts += 1;
       }
     }
+
+    keepPaths.add(postPath);
+  }
+
+  const allFiles = await listListeningMarkdownFiles();
+  for (const filePath of allFiles) {
+    if (!keepPaths.has(filePath)) {
+      fs.unlinkSync(filePath);
+      removedPosts += 1;
+    }
   }
 
   console.log(
-    `[albumwhale-sync] posts created: ${createdPosts}, posts updated: ${updatedPosts}, image downloads: ${downloadedImages}, image already present: ${existingImages}, image download failures: ${failedImages}`
+    `[albumwhale-sync] posts created: ${createdPosts}, posts updated: ${updatedPosts}, posts removed: ${removedPosts}, image downloads: ${downloadedImages}, image already present: ${existingImages}, image download failures: ${failedImages}`
   );
 }
 
