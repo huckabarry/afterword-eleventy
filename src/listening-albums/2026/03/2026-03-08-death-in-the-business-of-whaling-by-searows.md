@@ -6,9 +6,12 @@ tags:
 slug: "2026-03-08-death-in-the-business-of-whaling-by-searows"
 author: "Bryan Robb"
 albumwhale_url: "https://albumwhale.com/bryan/listening-now#album_69154"
+albumwhale_list: "listening-now"
 albumwhale_order: 1
 ---
 
 ![](/assets/listening-images/2026/2026-03-08-death-in-the-business-of-whaling-by-searows-a046ae6f.jpg)
+
+Source list: Listening Now.
 
 Listened on [Album Whale](https://albumwhale.com/bryan/listening-now#album_69154).

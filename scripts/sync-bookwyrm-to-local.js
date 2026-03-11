@@ -9,11 +9,13 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const POSTS_ROOT = path.join(ROOT_DIR, "src", "reading-books");
 const IMAGES_ROOT = path.join(ROOT_DIR, "src", "assets", "reading-images");
 const DEFAULT_AUTHOR = "Bryan Robb";
-const FEED_URL = "https://bookwyrm.social/user/bryan/rss";
+const OUTBOX_URL = "https://bookwyrm.social/user/bryan/outbox";
 const BOOK_HOST = "https://bookwyrm.social";
 const MAX_ITEMS = 120;
+const MAX_OUTBOX_PAGES = 50;
 
 const pageHtmlCache = new Map();
+const pageJsonCache = new Map();
 
 function slugify(value) {
   return String(value || "")
@@ -210,11 +212,193 @@ function cleanBookEventNote(note, type) {
     return "";
   }
 
-  if (type === "review" && /^review(?:\:| of)\b/i.test(cleaned)) {
-    return "";
+  if (type === "review") {
+    if (/^review(?:\:| of)\b/i.test(cleaned)) {
+      return "";
+    }
+
+    if (/^rated\s+.+?:\s*\d+\s+stars?$/i.test(cleaned)) {
+      return "";
+    }
   }
 
   return cleaned;
+}
+
+function extractBookUrlFromContentHtml(contentHtml) {
+  const match = String(contentHtml || "").match(/href=["']([^"']*\/book\/\d+[^"']*)["']/i);
+  return match && match[1] ? toAbsoluteUrl(match[1], BOOK_HOST) : "";
+}
+
+function extractBookUrlFromOutboxItem(item) {
+  const inReplyToBook = toAbsoluteUrl(item && item.inReplyToBook ? item.inReplyToBook : "", BOOK_HOST);
+  if (inReplyToBook) {
+    return inReplyToBook;
+  }
+
+  const tags = Array.isArray(item && item.tag) ? item.tag : [];
+  for (const tag of tags) {
+    const href = toAbsoluteUrl(tag && tag.href ? tag.href : "", BOOK_HOST);
+    if (href && /\/book\/\d+/i.test(href)) {
+      return href;
+    }
+  }
+
+  return extractBookUrlFromContentHtml(item && item.content ? item.content : "");
+}
+
+function extractBookTitleFromAttachmentName(name) {
+  const value = String(name || "").trim();
+  if (!value) {
+    return "";
+  }
+
+  const colonIndex = value.indexOf(":");
+  if (colonIndex === -1) {
+    return "";
+  }
+
+  const afterColon = value.slice(colonIndex + 1).trim();
+  const parenIndex = afterColon.lastIndexOf("(");
+  const title = (parenIndex === -1 ? afterColon : afterColon.slice(0, parenIndex)).trim();
+  return stripHtml(title);
+}
+
+function extractBookTitleFromOutboxItem(item) {
+  const tags = Array.isArray(item && item.tag) ? item.tag : [];
+  const titleTag = tags.find((tag) => String(tag && tag.name ? tag.name : "").trim().startsWith("@"));
+  if (titleTag && titleTag.name) {
+    return stripHtml(String(titleTag.name).replace(/^@/, "").trim());
+  }
+
+  const nameTitleMatch = String(item && item.name ? item.name : "").match(/review(?:\:| of)\s+"?(.+?)"?(\s+\(\d+\s+stars?\))?(?::|$)/i);
+  if (nameTitleMatch && nameTitleMatch[1]) {
+    return stripHtml(nameTitleMatch[1]);
+  }
+
+  const content = String(item && item.content ? item.content : "");
+  const italicMatch = content.match(/<i>([^<]+)<\/i>/i);
+  if (italicMatch && italicMatch[1]) {
+    return stripHtml(italicMatch[1]);
+  }
+
+  const linkTextMatch = content.match(/<a[^>]+href=["'][^"']*\/book\/\d+[^"']*["'][^>]*>([\s\S]*?)<\/a>/i);
+  if (linkTextMatch && linkTextMatch[1]) {
+    return stripHtml(linkTextMatch[1]);
+  }
+
+  const attachments = Array.isArray(item && item.attachment) ? item.attachment : [];
+  const attachmentWithName = attachments.find((entry) => entry && entry.name);
+  return extractBookTitleFromAttachmentName(attachmentWithName ? attachmentWithName.name : "");
+}
+
+function extractBookAuthorFromAttachmentName(name) {
+  const value = String(name || "").trim();
+  if (!value) {
+    return "";
+  }
+
+  const colonIndex = value.indexOf(":");
+  if (colonIndex === -1) {
+    return "";
+  }
+
+  return stripHtml(value.slice(0, colonIndex).trim());
+}
+
+function extractBookAuthorFromOutboxItem(item) {
+  const content = String(item && item.content ? item.content : "");
+  const byMatch = content.match(/\bby\s+<a[^>]*>([^<]+)<\/a>/i);
+  if (byMatch && byMatch[1]) {
+    return stripHtml(byMatch[1]);
+  }
+
+  const attachments = Array.isArray(item && item.attachment) ? item.attachment : [];
+  const attachmentWithName = attachments.find((entry) => entry && entry.name);
+  return extractBookAuthorFromAttachmentName(attachmentWithName ? attachmentWithName.name : "");
+}
+
+function extractBookCoverFromOutboxItem(item) {
+  const attachments = Array.isArray(item && item.attachment) ? item.attachment : [];
+  const documentAttachment = attachments.find((entry) => entry && entry.url);
+  return documentAttachment ? toAbsoluteUrl(documentAttachment.url, BOOK_HOST) : "";
+}
+
+function normalizeRating(value) {
+  if (typeof value !== "number" && typeof value !== "string") {
+    return null;
+  }
+
+  const parsed = Number.parseInt(String(value), 10);
+  if (!Number.isFinite(parsed) || parsed < 1 || parsed > 5) {
+    return null;
+  }
+
+  return parsed;
+}
+
+function parseOutboxEventType(item, contentText, nameText) {
+  const readingStatus = String(item && item.readingStatus ? item.readingStatus : "").toLowerCase();
+  const lowerContent = String(contentText || "").toLowerCase();
+  const lowerName = String(nameText || "").toLowerCase();
+
+  if (readingStatus === "reading" || lowerContent.includes("started reading")) {
+    return "started";
+  }
+
+  if (readingStatus === "read" || lowerContent.includes("finished reading")) {
+    return "finished";
+  }
+
+  if (
+    normalizeRating(item && item.rating) ||
+    lowerName.startsWith("review of") ||
+    lowerName.startsWith("review:") ||
+    lowerContent.startsWith("rated ")
+  ) {
+    return "review";
+  }
+
+  return "";
+}
+
+function parseBookWyrmOutboxActivity(item) {
+  const contentHtml = String(item && item.content ? item.content : "");
+  const contentText = stripHtml(contentHtml);
+  const nameText = stripHtml(String(item && item.name ? item.name : ""));
+  const eventType = parseOutboxEventType(item, contentText, nameText);
+  if (!eventType) {
+    return null;
+  }
+
+  const bookUrl = extractBookUrlFromOutboxItem(item);
+  const bookTitle = extractBookTitleFromOutboxItem(item);
+  if (!bookUrl && !bookTitle) {
+    return null;
+  }
+
+  const rating =
+    eventType === "review"
+      ? normalizeRating(item && item.rating) ||
+        parseReviewRating(String(item && item.name ? item.name : "")) ||
+        parseReviewRating(contentText)
+      : null;
+
+  const reviewHeadline = deriveReviewHeadline(String(item && item.name ? item.name : ""));
+  const fallbackReviewNote = reviewHeadline || nameText;
+  const rawNote = eventType === "review" ? contentText || fallbackReviewNote : contentText;
+
+  return {
+    eventType,
+    date: normalizeDate(item && (item.published || item.updated) ? item.published || item.updated : Date.now()),
+    rating,
+    sourceUrl: toAbsoluteUrl(item && item.id ? item.id : "", BOOK_HOST),
+    note: cleanBookEventNote(rawNote, eventType),
+    bookUrl,
+    bookTitle,
+    bookAuthor: extractBookAuthorFromOutboxItem(item),
+    coverUrl: extractBookCoverFromOutboxItem(item)
+  };
 }
 
 async function fetchText(url) {
@@ -242,6 +426,64 @@ async function fetchText(url) {
   const text = await response.text();
   pageHtmlCache.set(target, text);
   return text;
+}
+
+async function fetchJson(url, accept = "application/json") {
+  const target = String(url || "").trim();
+  if (!target) {
+    return null;
+  }
+
+  const cacheKey = `${accept}:${target}`;
+  if (pageJsonCache.has(cacheKey)) {
+    return pageJsonCache.get(cacheKey);
+  }
+
+  const response = await fetch(target, {
+    redirect: "follow",
+    headers: {
+      "User-Agent": "afterword.blog bookwyrm sync script",
+      Accept: accept
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status} for ${target}`);
+  }
+
+  const data = await response.json();
+  pageJsonCache.set(cacheKey, data);
+  return data;
+}
+
+async function fetchBookWyrmOutboxItems() {
+  const outboxRoot = await fetchJson(OUTBOX_URL, "application/activity+json");
+  if (!outboxRoot) {
+    return [];
+  }
+
+  let nextPageUrl = toAbsoluteUrl(outboxRoot.first || `${OUTBOX_URL}?page=1`, BOOK_HOST);
+  const seenPages = new Set();
+  const outboxItems = [];
+  let pageCount = 0;
+
+  while (nextPageUrl && !seenPages.has(nextPageUrl) && pageCount < MAX_OUTBOX_PAGES) {
+    seenPages.add(nextPageUrl);
+
+    const page = await fetchJson(nextPageUrl, "application/activity+json");
+    const orderedItems = Array.isArray(page && page.orderedItems) ? page.orderedItems : [];
+    outboxItems.push(...orderedItems);
+
+    const next = String(page && page.next ? page.next : "").trim();
+    nextPageUrl = next ? toAbsoluteUrl(next, BOOK_HOST) : "";
+    pageCount += 1;
+  }
+
+  if (pageCount >= MAX_OUTBOX_PAGES) {
+    console.warn(`[bookwyrm-sync] reached page limit (${MAX_OUTBOX_PAGES}) while crawling outbox`);
+  }
+
+  return outboxItems;
 }
 
 async function resolveBookUrlFromEntryUrl(entryUrl) {
@@ -632,18 +874,15 @@ async function main() {
   await fsp.mkdir(IMAGES_ROOT, { recursive: true });
 
   const records = await loadExistingRecords();
-  const rssXml = await fetchText(FEED_URL);
-  const feedItems = parseRssItems(rssXml);
+  const outboxItems = await fetchBookWyrmOutboxItems();
 
-  for (const item of feedItems) {
-    const eventType = classifyItem(item);
-    if (!eventType) {
+  for (const outboxItem of outboxItems) {
+    const activity = parseBookWyrmOutboxActivity(outboxItem);
+    if (!activity) {
       continue;
     }
 
-    const bookTitle = deriveBookTitle(item);
-    const resolvedBookUrl = item.bookUrl || (await resolveBookUrlFromEntryUrl(item.link));
-    const key = buildBookKey(resolvedBookUrl, bookTitle);
+    const key = buildBookKey(activity.bookUrl, activity.bookTitle);
 
     if (!records.has(key)) {
       records.set(key, createBookRecord());
@@ -651,19 +890,17 @@ async function main() {
 
     const record = records.get(key);
     record.key = key;
-    record.bookTitle = record.bookTitle || bookTitle;
-    record.bookAuthor = record.bookAuthor || deriveBookAuthorFromRawTitle(item.title);
-    record.bookUrl = record.bookUrl || resolvedBookUrl;
-
-    const reviewHeadline = deriveReviewHeadline(item.title);
-    const rawNote = item.description || reviewHeadline;
+    record.bookTitle = record.bookTitle || activity.bookTitle;
+    record.bookAuthor = record.bookAuthor || activity.bookAuthor;
+    record.bookUrl = record.bookUrl || activity.bookUrl;
+    record.coverRemoteUrl = record.coverRemoteUrl || activity.coverUrl;
 
     upsertEvent(record, {
-      type: eventType,
-      date: normalizeDate(item.date),
-      rating: eventType === "review" ? parseReviewRating(item.title) : null,
-      sourceUrl: item.link,
-      note: cleanBookEventNote(rawNote, eventType)
+      type: activity.eventType,
+      date: activity.date,
+      rating: activity.rating,
+      sourceUrl: activity.sourceUrl,
+      note: activity.note
     });
   }
 
@@ -736,7 +973,7 @@ async function main() {
 
     await fsp.mkdir(targetDir, { recursive: true });
 
-    const coverUrl = await getCoverFromBookUrl(record.bookUrl);
+    const coverUrl = (await getCoverFromBookUrl(record.bookUrl)) || record.coverRemoteUrl;
     if (coverUrl) {
       record.coverRemoteUrl = coverUrl;
       const hash = crypto.createHash("sha1").update(coverUrl).digest("hex").slice(0, 8);
@@ -762,7 +999,8 @@ async function main() {
     }
 
     const hasFinished = events.some((event) => event.type === "finished");
-    const tags = hasFinished ? ["books"] : ["books", "now-reading"];
+    const hasStarted = events.some((event) => event.type === "started");
+    const tags = hasStarted && !hasFinished ? ["books", "now-reading"] : ["books"];
     const excerpt = getEventSummary(events);
     const newestSource = [...events]
       .filter((event) => event.sourceUrl)

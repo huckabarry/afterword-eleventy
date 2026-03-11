@@ -1,7 +1,7 @@
 ---
 title: "Running on empty"
-date: 2025-10-26T00:51:05.000Z
-updated_at: 2025-10-26T00:51:05.000Z
+date: 2025-10-26T00:00:00.000Z
+updated_at: 2025-10-26T00:00:00.000Z
 tags:
   - books
   - now-reading

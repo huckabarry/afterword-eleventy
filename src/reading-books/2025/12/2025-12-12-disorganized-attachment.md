@@ -1,7 +1,7 @@
 ---
 title: "Disorganized Attachment"
-date: 2025-12-12T03:18:55.000Z
-updated_at: 2025-12-12T03:18:55.000Z
+date: 2025-12-12T00:00:00.000Z
+updated_at: 2025-12-12T00:00:00.000Z
 tags:
   - books
 slug: "disorganized-attachment"

@@ -6,9 +6,12 @@ tags:
 slug: "2026-03-06-forever-is-a-feeling-the-archives-by-lucy-dacus"
 author: "Bryan Robb"
 albumwhale_url: "https://albumwhale.com/bryan/listening-now#album_69051"
-albumwhale_order: 3
+albumwhale_list: "listening-now"
+albumwhale_order: 8
 ---
 
 ![](/assets/listening-images/2026/2026-03-06-forever-is-a-feeling-the-archives-by-lucy-dacus-2256304e.jpg)
+
+Source list: Listening Now.
 
 Listened on [Album Whale](https://albumwhale.com/bryan/listening-now#album_69051).
