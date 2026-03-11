@@ -5,7 +5,7 @@ const ghostApiKey = process.env.GHOST_ADMIN_KEY;
 const canUseGhostApi = Boolean(ghostApiUrl && ghostApiKey);
 let ghostApi = null;
 
-const INCLUDED_SITE_TAGS = ["afterword", "status", "gallery", "photos"];
+const INCLUDED_SITE_TAGS = ["afterword", "status", "gallery", "photos", "now"];
 
 const TAG_DESCRIPTIONS = {
   afterword: "Longer posts from Low Velocity.",
@@ -766,6 +766,11 @@ async function getGhostPosts() {
   return ghostPostsPromise;
 }
 
+async function getGhostNowPosts() {
+  const posts = await getGhostPosts();
+  return posts.filter((post) => postHasTag(post, "now"));
+}
+
 function getLocalListeningPosts(collectionApi) {
   if (!collectionApi || typeof collectionApi.getFilteredByGlob !== "function") {
     return [];
@@ -879,8 +884,11 @@ module.exports = function (eleventyConfig) {
   });
 
   eleventyConfig.addCollection("listeningPosts", async (collectionApi) => {
-    const posts = await getMergedPosts(collectionApi);
-    return posts.filter((post) => isListeningPost(post));
+    return assignUniqueLocalSlugs(getLocalListeningPosts(collectionApi)).sort(comparePostsDesc);
+  });
+
+  eleventyConfig.addCollection("ghostNowPosts", async () => {
+    return await getGhostNowPosts();
   });
 
   eleventyConfig.addCollection("photoPosts", async () => {
@@ -898,15 +906,12 @@ module.exports = function (eleventyConfig) {
   });
 
   eleventyConfig.addCollection("bookPosts", async (collectionApi) => {
-    const posts = await getMergedPosts(collectionApi);
+    const posts = assignUniqueLocalSlugs(getLocalBookPosts(collectionApi)).sort(comparePostsDesc);
 
-    return posts
-      .filter((post) => isBookPost(post))
-      .map((post) => ({
-        ...post,
-        firstImage: extractFirstImage(post)
-      }))
-      .filter((post) => post.firstImage);
+    return posts.map((post) => ({
+      ...post,
+      firstImage: extractFirstImage(post)
+    }));
   });
 
   eleventyConfig.addCollection("tagPages", async (collectionApi) => {
