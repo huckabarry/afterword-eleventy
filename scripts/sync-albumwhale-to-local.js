@@ -330,7 +330,7 @@ async function fetchAlbumWhale() {
   for (const album of combined) {
     const key = String(
       album &&
-        `${String(album.id || "").trim()}|${String(album.link || "").trim()}|${String(album.date || "").trim()}|${String(album.title || "").trim()}`
+        `${String(album.id || "").trim()}|${String(album.link || "").trim()}|${String(album.title || "").trim()}`
     ).trim();
     if (!key || seen.has(key)) {
       continue;
