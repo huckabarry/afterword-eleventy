@@ -1,13 +1,12 @@
 ---
 title: "White Nights"
 date: 2024-12-31T00:00:00.000Z
-updated_at: 2024-12-31T00:00:00.000Z
 tags:
   - books
 slug: "white-nights"
 author: "Bryan Robb"
 book_author: "Fyodor Dostoyevsky"
-excerpt: "Reading log"
+excerpt: "Finished on 2024-12-31"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457523"
 book_url: "https://bookwyrm.social/book/1011673"
 ---
@@ -20,4 +19,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2024-12-31 reviewed (3 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457523))
+- 2024-12-31 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457523))

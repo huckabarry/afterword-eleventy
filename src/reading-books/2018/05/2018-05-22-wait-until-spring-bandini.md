@@ -1,13 +1,12 @@
 ---
 title: "Wait Until Spring, Bandini"
 date: 2018-05-22T00:00:00.000Z
-updated_at: 2018-05-22T00:00:00.000Z
 tags:
   - books
 slug: "wait-until-spring-bandini"
 author: "Bryan Robb"
 book_author: "John Fante"
-excerpt: "Reading log"
+excerpt: "Finished on 2018-05-22"
 bookwyrm_url: "https://bookwyrm.social/user/bryan/reviewrating/7457559"
 book_url: "https://bookwyrm.social/book/142263"
 ---
@@ -20,4 +19,4 @@ BookWyrm profile entry: [View](https://bookwyrm.social/user/bryan/reviewrating/7
 
 ## Reading Log
 
-- 2018-05-22 reviewed (4 stars) ([source](https://bookwyrm.social/user/bryan/reviewrating/7457559))
+- 2018-05-22 finished ([source](https://bookwyrm.social/user/bryan/reviewrating/7457559))

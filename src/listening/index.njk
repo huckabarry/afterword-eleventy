@@ -4,36 +4,25 @@ title: Listening
 permalink: /listening/
 ---
 
-{% set listeningPosts = collections.listeningPosts | byPublishedDateDesc %}
+{% set listeningPosts = collections.posts | withAnyTagSlugs("listening,now-playing") | byPublishedDateDesc %}
 
 <section class="section-block">
   <h1 class="section-title">Listening</h1>
 
   {% if listeningPosts and listeningPosts.length %}
-    <div class="cover-grid cover-grid-listening h-feed">
+    <ul class="site-list-of-posts">
       {% for post in listeningPosts %}
-        {% set coverImage = post | firstImage %}
-        <article class="cover-card h-entry">
-          <a class="cover-card-link u-url" href="{{ post | localPostUrl }}">
-            {% if coverImage %}
-              <img
-                class="cover-card-image u-photo"
-                src="{{ coverImage.src }}"
-                alt="{{ coverImage.alt }}"
-                loading="lazy"
-              >
-            {% else %}
-              <span class="cover-card-image cover-card-image-fallback" aria-hidden="true"></span>
-            {% endif %}
-            <span class="cover-card-title p-name">{{ post.title }}</span>
-          </a>
-          <time class="site-visually-hidden dt-published" datetime="{{ post.published_at | htmlDateString }}">
+        <li class="site-list-of-posts-item">
+          <div class="site-list-link">
+            <a href="{{ post | localPostUrl }}">{{ post.title }}</a>
+          </div>
+          <time class="site-list-date" datetime="{{ post.published_at | htmlDateString }}">
             {{ post.published_at | dateDisplay }}
           </time>
-        </article>
+        </li>
       {% endfor %}
-    </div>
+    </ul>
   {% else %}
-    <p>No listening posts are available yet.</p>
+    <p>No listening entries yet.</p>
   {% endif %}
 </section>
