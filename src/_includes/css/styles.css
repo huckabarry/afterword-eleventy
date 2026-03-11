@@ -734,6 +734,31 @@ h6 {
   line-height: 1;
 }
 
+.interest-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.interest-pill {
+  --pill-hue: 0;
+  --pill-bg: hsl(var(--pill-hue), 80%, 72%);
+  --pill-text: hsl(var(--pill-hue), 65%, 18%);
+  margin: 0;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--pill-bg) 72%, #1a1a1a 28%);
+  background: linear-gradient(135deg, color-mix(in oklab, var(--pill-bg) 85%, white 15%), var(--pill-bg));
+  color: var(--pill-text);
+  font-size: 0.78rem;
+  line-height: 1.25;
+  font-style: normal;
+  font-weight: 600;
+}
+
 .tag-archive .section-title {
   margin-bottom: 0.35rem;
 }
@@ -843,6 +868,14 @@ h6 {
 
 .books-card-image {
   border-radius: 0.4rem;
+}
+
+.books-card-image-fallback {
+  display: block;
+  aspect-ratio: 2 / 3;
+  background: linear-gradient(135deg, #2e3133, #242728);
+  border: 1px solid var(--border);
+  opacity: 0.8;
 }
 
 body.photo-lightbox-open {
