@@ -827,6 +827,13 @@ module.exports = function (eleventyConfig) {
     return `${day} ${month}`.trim();
   });
 
+  eleventyConfig.addFilter("dateYear", (date) => {
+    return new Intl.DateTimeFormat("en-US", {
+      year: "numeric",
+      timeZone: "UTC"
+    }).format(new Date(date));
+  });
+
   eleventyConfig.addFilter("htmlDateString", (dateObj) => new Date(dateObj).toISOString().split("T")[0]);
   eleventyConfig.addFilter("rfc3339Date", (dateObj) => new Date(dateObj).toISOString());
   eleventyConfig.addFilter("rfc822Date", (dateObj) => new Date(dateObj).toUTCString());
