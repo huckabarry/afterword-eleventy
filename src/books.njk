@@ -11,12 +11,16 @@ description: "Book covers from posts tagged books."
     {% for post in collections.bookPosts %}
       <article class="photo-card h-entry">
         <a class="photo-card-link u-url" href="{{ post | localPostUrl }}">
+          {% if post.firstImage %}
           <img
             class="photo-card-image books-card-image u-photo"
             src="{{ post.firstImage.src }}"
             alt="{{ post.firstImage.alt }}"
             loading="lazy"
           >
+          {% else %}
+          <span class="photo-card-image books-card-image books-card-image-fallback" aria-hidden="true"></span>
+          {% endif %}
         </a>
         <span class="site-visually-hidden p-name">{{ post.title }}</span>
         <time class="site-visually-hidden dt-published" datetime="{{ post.published_at | htmlDateString }}">

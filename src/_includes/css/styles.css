@@ -845,6 +845,14 @@ h6 {
   border-radius: 0.4rem;
 }
 
+.books-card-image-fallback {
+  display: block;
+  aspect-ratio: 2 / 3;
+  background: linear-gradient(135deg, #2e3133, #242728);
+  border: 1px solid var(--border);
+  opacity: 0.8;
+}
+
 body.photo-lightbox-open {
   overflow: hidden;
 }
