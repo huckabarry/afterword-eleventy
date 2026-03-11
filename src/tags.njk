@@ -7,14 +7,16 @@ permalink: "{{ tagPage.url }}"
 layout: base
 ---
 
-{% set mediaTag = tagPage.slug == "listening" or tagPage.slug == "now-playing" or tagPage.slug == "books" or tagPage.slug == "now-reading" %}
+{% set listeningTag = tagPage.slug == "listening" or tagPage.slug == "now-playing" %}
+{% set booksTag = tagPage.slug == "books" or tagPage.slug == "now-reading" %}
+{% set mediaTag = listeningTag or booksTag %}
 
-<section class="section-block tag-archive{% if tagPage.slug == 'status' %} tag-archive-status{% elif tagPage.slug == 'listening' or tagPage.slug == 'now-playing' %} tag-archive-listening{% endif %}">
+<section class="section-block tag-archive{% if tagPage.slug == 'status' %} tag-archive-status{% elif listeningTag %} tag-archive-listening{% elif booksTag %} tag-archive-books{% endif %}">
   <h1 class="section-title">{% if tagPage.slug == "status" %}Status Archive{% elif tagPage.slug == "listening" or tagPage.slug == "now-playing" %}Listening History{% else %}{{ tagPage.name }}{% endif %}</h1>
   {% if tagPage.description %}
     <p class="home-description">{{ tagPage.description }}</p>
   {% endif %}
-  {% if mediaTag %}
+  {% if listeningTag %}
   <div class="cover-grid cover-grid-listening h-feed">
     {% for post in tagPage.posts %}
       {% set coverImage = post | firstImage %}
@@ -33,11 +35,27 @@ layout: base
           <span class="cover-card-title p-name">{{ post.title }}</span>
         </a>
         <time class="site-visually-hidden dt-published" datetime="{{ post.published_at | htmlDateString }}">
-          {{ post.published_at | dateDisplay }}
+          {{ post.published_at | dateDisplay }}{% if tagPage.slug == "status" %}, {{ post.published_at | dateYear }}{% endif %}
         </time>
         <span class="site-visually-hidden p-author h-card">
           <a class="p-name u-url" href="{{ site.url }}">{{ site.title }}</a>
         </span>
+      </article>
+    {% endfor %}
+  </div>
+  {% elif booksTag %}
+  <div class="photo-grid books-grid h-feed">
+    {% for post in tagPage.posts %}
+      {% set coverImage = post | firstImage %}
+      <article class="photo-card h-entry">
+        <a class="photo-card-link u-url" href="{{ post | localPostUrl }}">
+          {% if coverImage %}
+          <img class="photo-card-image books-card-image u-photo" src="{{ coverImage.src }}" alt="{{ coverImage.alt }}" loading="lazy">
+          {% else %}
+          <span class="photo-card-image books-card-image books-card-image-fallback" aria-hidden="true"></span>
+          {% endif %}
+        </a>
+        <span class="site-visually-hidden p-name">{{ post.title }}</span>
       </article>
     {% endfor %}
   </div>
@@ -50,7 +68,7 @@ layout: base
       {% endif %}
       <li class="site-list-of-posts-item h-entry">
         <time class="site-list-date dt-published" datetime="{{ post.published_at | htmlDateString }}">
-          {{ post.published_at | dateDisplay }}
+          {{ post.published_at | dateDisplay }}{% if tagPage.slug == "status" %}, {{ post.published_at | dateYear }}{% endif %}
         </time>
         <div>
           <a class="site-list-link p-name u-url" href="{{ post | localPostUrl }}">{{ listTitle or "Untitled" }}</a>

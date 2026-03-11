@@ -734,6 +734,28 @@ h6 {
   line-height: 1;
 }
 
+.interest-pill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.interest-pill {
+  margin: 0;
+  padding: 0.25rem 0.58rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(44, 47, 48, 0.7);
+  color: #f2f2f2;
+  font-size: 0.78rem;
+  line-height: 1.25;
+  font-style: normal;
+  font-weight: 600;
+}
+
 .tag-archive .section-title {
   margin-bottom: 0.35rem;
 }
@@ -843,6 +865,14 @@ h6 {
 
 .books-card-image {
   border-radius: 0.4rem;
+}
+
+.books-card-image-fallback {
+  display: block;
+  aspect-ratio: 2 / 3;
+  background: linear-gradient(135deg, #2e3133, #242728);
+  border: 1px solid var(--border);
+  opacity: 0.8;
 }
 
 body.photo-lightbox-open {
