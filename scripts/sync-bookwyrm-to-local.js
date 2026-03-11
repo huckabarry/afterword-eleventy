@@ -148,7 +148,7 @@ function parseReviewRating(rawTitle) {
 
 function deriveReviewHeadline(rawTitle) {
   const title = String(rawTitle || "").trim();
-  const match = title.match(/review(?:\:| of).+?(?:\(\d+\s+stars?\))?\:\s*(.+)$/i);
+  const match = title.match(/review(?::| of).+?(?:\(\d+\s+stars?\))?:\s*(.+)$/i);
   return match && match[1] ? match[1].trim() : "";
 }
 
@@ -214,7 +214,7 @@ function cleanBookEventNote(note, type) {
   }
 
   if (type === "review") {
-    if (/^review(?:\:| of)\b/i.test(cleaned)) {
+    if (/^review(?::| of)\b/i.test(cleaned)) {
       return "";
     }
 
@@ -272,7 +272,7 @@ function extractBookTitleFromOutboxItem(item) {
     return stripHtml(String(titleTag.name).replace(/^@/, "").trim());
   }
 
-  const nameTitleMatch = String(item && item.name ? item.name : "").match(/review(?:\:| of)\s+"?(.+?)"?(\s+\(\d+\s+stars?\))?(?::|$)/i);
+  const nameTitleMatch = String(item && item.name ? item.name : "").match(/review(?::| of)\s+"?(.+?)"?(\s+\(\d+\s+stars?\))?(?::|$)/i);
   if (nameTitleMatch && nameTitleMatch[1]) {
     return stripHtml(nameTitleMatch[1]);
   }
@@ -363,6 +363,8 @@ function parseOutboxEventType(item, contentText, nameText) {
   return "";
 }
 
+// Reserved for future ActivityPub outbox ingestion support.
+// eslint-disable-next-line no-unused-vars
 function parseBookWyrmOutboxActivity(item) {
   const contentHtml = String(item && item.content ? item.content : "");
   const contentText = stripHtml(contentHtml);
@@ -457,6 +459,8 @@ async function fetchJson(url, accept = "application/json") {
   return data;
 }
 
+// Reserved for future ActivityPub outbox ingestion support.
+// eslint-disable-next-line no-unused-vars
 async function fetchBookWyrmOutboxItems() {
   const outboxRoot = await fetchJson(OUTBOX_URL, "application/activity+json");
   if (!outboxRoot) {
