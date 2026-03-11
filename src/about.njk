@@ -7,6 +7,8 @@ description: "Hello, fellow wanderer. I’m Bryan and this is my blog, a place w
 
 {% set readingPosts = collections.bookPosts | byPublishedDateDesc %}
 {% set readingPost = readingPosts[0] %}
+{% set interestsRaw = "urban design, landscape architecture, transit maps, subway systems, Detroit, Toronto, New York, Philadelphia, wandering neighborhoods, wandering cities at dusk, mossy Pacific Northwest forests, cedar smell after rain, photography walks, maps of places I haven’t been yet, dark satire, psychological character studies, unconventional love stories, concert ticket stubs, boxes of old letters and photographs, Polaroids, post-it notes, homemade cards, letters, gardening, tomatoes that take over the yard by August, cooking experiments, building and fixing things, small personal websites, RSS feeds, strange corners of the internet, soda water, caramel, potato pancakes, Midwest nostalgia, Italian genealogy rabbit holes, pastoral punk dystopias, the strange landscapes of American suburbia, anti-sprawl, Mies van der Rohe, modernism, desert mid century modernism, Charles and Ray Eames, Frank Gehry, typography, industrial design, Tom Ford, IKEA, Cézanne, post-Impressionism, cubism, watercolors, Murakami, Vonnegut, Dostoevsky, Ray Nayler, Ernest Hemingway, Virginia Woolf, Mitski, Japanese Breakfast, Angel Olsen, Liz Phair, Deep Sea Diver, Cate Le Bon, St. Vincent, Lucy Dacus, Kevin Devine, Pavement, Interpol, David Bowie, New Order, Joy Division, Talking Heads, The Smiths, Gang of Four, Wire, The Modern Lovers, The Beatles, Neil Young, Gord Downie" %}
+{% set interests = interestsRaw.split(',') %}
 
 <article class="content content-page h-entry">
   <header class="post-header">
@@ -50,8 +52,17 @@ description: "Hello, fellow wanderer. I’m Bryan and this is my blog, a place w
     <p>Most of what you’ll find here lives in that space.</p>
 
     <h2>Interests</h2>
-    <p><em>(in no particular order)</em><br>
-    urban design, landscape architecture, transit maps, subway systems, Detroit, Toronto, New York, Philadelphia, wandering neighborhoods, wandering cities at dusk, mossy Pacific Northwest forests, cedar smell after rain, photography walks, maps of places I haven’t been yet, dark satire, psychological character studies, unconventional love stories, concert ticket stubs, boxes of old letters and photographs, Polaroids, post-it notes, homemade cards, letters, gardening, tomatoes that take over the yard by August, cooking experiments, building and fixing things, small personal websites, RSS feeds, strange corners of the internet, soda water, caramel, potato pancakes, Midwest nostalgia, Italian genealogy rabbit holes, pastoral punk dystopias, the strange landscapes of American suburbia, anti-sprawl, Mies van der Rohe, modernism, desert mid century modernism, Charles and Ray Eames, Frank Gehry, typography, industrial design, Tom Ford, IKEA, Cézanne, post-Impressionism, cubism, watercolors, Murakami, Vonnegut, Dostoevsky, Ray Nayler, Ernest Hemingway, Virginia Woolf, Mitski, Japanese Breakfast, Angel Olsen, Liz Phair, Deep Sea Diver, Cate Le Bon, St. Vincent, Lucy Dacus, Kevin Devine, Pavement, Interpol, David Bowie, New Order, Joy Division, Talking Heads, The Smiths, Gang of Four, Wire, The Modern Lovers, The Beatles, Neil Young, Gord Downie</p>
+    <p><em>(in no particular order)</em></p>
+    <ul class="interest-pill-list" aria-label="Interests list">
+      {% set interestCount = interests | length %}
+      {% for interest in interests %}
+        {% set pill = interest | trim %}
+        {% if pill %}
+          {% set hue = ((loop.index0 / (interestCount - 1)) * 300) | round(0, 'floor') %}
+          <li class="interest-pill" style="--pill-hue: {{ hue }};">{{ pill }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
   </div>
 </section>
 
@@ -61,6 +72,7 @@ description: "Hello, fellow wanderer. I’m Bryan and this is my blog, a place w
     <div class="home-stream">
       {% set post = readingPost %}
       {% set streamImage = post | firstImage %}
+      {% set readingExcerpt = post.excerpt or (post | rssDescription) %}
       <article class="home-stream-item home-stream-item-reading h-entry">
         <p class="home-stream-meta home-stream-meta-reading">
           <a class="u-url" href="{{ post | localPostUrl }}">
@@ -76,8 +88,8 @@ description: "Hello, fellow wanderer. I’m Bryan and this is my blog, a place w
           </a>
         {% endif %}
         <div class="home-stream-body home-stream-body-reading e-content">
-          {% if post.excerpt %}
-            <p>{{ post.excerpt }}</p>
+          {% if readingExcerpt %}
+            <p>{{ readingExcerpt }}</p>
           {% endif %}
         </div>
       </article>
