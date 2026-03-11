@@ -958,7 +958,6 @@ async function main() {
   let downloadedImages = 0;
   let existingImages = 0;
   let failedImages = 0;
-  const keepPaths = new Set();
 
   for (const record of records.values()) {
     if (!record.events.size && record.fallbackEvents.length) {
@@ -1037,8 +1036,6 @@ async function main() {
       }
     }
 
-    keepPaths.add(targetPath);
-
     record.candidatePaths.forEach((candidate) => {
       if (candidate !== targetPath && fs.existsSync(candidate)) {
         fs.unlinkSync(candidate);
@@ -1047,13 +1044,8 @@ async function main() {
     });
   }
 
-  const allFiles = await listReadingMarkdownFiles();
-  for (const filePath of allFiles) {
-    if (!keepPaths.has(filePath)) {
-      fs.unlinkSync(filePath);
-      removedPosts += 1;
-    }
-  }
+  // Do not prune local reading history when feeds are partial/truncated.
+  // We only create/update entries we can currently fetch and preserve older files.
 
   console.log(
     `[bookwyrm-sync] posts created: ${createdPosts}, posts updated: ${updatedPosts}, posts removed: ${removedPosts}, image downloads: ${downloadedImages}, image already present: ${existingImages}, image download failures: ${failedImages}`

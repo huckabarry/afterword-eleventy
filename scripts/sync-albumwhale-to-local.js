@@ -417,28 +417,6 @@ function createMarkdown({
   return frontMatter.concat(body).join("\n");
 }
 
-async function listListeningMarkdownFiles() {
-  const files = [];
-
-  const walk = async (dir) => {
-    const entries = await fsp.readdir(dir, { withFileTypes: true });
-    for (const entry of entries) {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        await walk(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith(".md") && !entry.name.startsWith("_")) {
-        files.push(fullPath);
-      }
-    }
-  };
-
-  if (fs.existsSync(POSTS_ROOT)) {
-    await walk(POSTS_ROOT);
-  }
-
-  return files;
-}
-
 async function main() {
   const albums = await fetchAlbumWhale();
 
@@ -449,11 +427,9 @@ async function main() {
 
   let createdPosts = 0;
   let updatedPosts = 0;
-  let removedPosts = 0;
   let downloadedImages = 0;
   let existingImages = 0;
   let failedImages = 0;
-  const keepPaths = new Set();
 
   for (const [albumIndex, album] of albums.entries()) {
     const title = String(album && album.title ? album.title : "").trim() || "Untitled album";
@@ -520,19 +496,13 @@ async function main() {
       }
     }
 
-    keepPaths.add(postPath);
   }
 
-  const allFiles = await listListeningMarkdownFiles();
-  for (const filePath of allFiles) {
-    if (!keepPaths.has(filePath)) {
-      fs.unlinkSync(filePath);
-      removedPosts += 1;
-    }
-  }
+  // Do not prune local listening history when feeds are partial/truncated.
+  // We only create/update items we can currently fetch and preserve older files.
 
   console.log(
-    `[albumwhale-sync] posts created: ${createdPosts}, posts updated: ${updatedPosts}, posts removed: ${removedPosts}, image downloads: ${downloadedImages}, image already present: ${existingImages}, image download failures: ${failedImages}`
+    `[albumwhale-sync] posts created: ${createdPosts}, posts updated: ${updatedPosts}, image downloads: ${downloadedImages}, image already present: ${existingImages}, image download failures: ${failedImages}`
   );
 }
 
